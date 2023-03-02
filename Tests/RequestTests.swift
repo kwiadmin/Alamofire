@@ -27,6 +27,25 @@ import Foundation
 import XCTest
 
 final class RequestResponseTestCase: BaseTestCase {
+    @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+    func testCompressedRequests() async {
+        // Given
+        let url = Endpoint.method(.post).url
+        let parameters = TestParameters(property: "compressed")
+
+        // When
+        let result = await AF.request(url,
+                                      method: .post,
+                                      parameters: parameters,
+                                      encoder: .json,
+                                      interceptor: DeflateRequestCompressor())
+            .serializingDecodable(TestResponse.self)
+            .result
+
+        // Then
+        XCTAssertTrue(result.isSuccess)
+    }
+
     func testRequestResponse() {
         // Given
         let url = Endpoint.get.url
